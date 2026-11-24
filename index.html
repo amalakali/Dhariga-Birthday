@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f8e8ef">
+  <title>A Little World of Dhariga 🐼</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Pacifico&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --cream: #fffaf3;
+      --pink: #f7dce7;
+      --pink-dark: #d88da9;
+      --lavender: #e8e0f6;
+      --ink: #514451;
+      --muted: #887987;
+      --paper: #fffdf9;
+      --line: #eadde2;
+      --shadow: 0 14px 35px rgba(112, 77, 99, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "DM Sans", sans-serif;
+      background:
+        radial-gradient(circle at 10% 12%, rgba(247,220,231,.8), transparent 28%),
+        radial-gradient(circle at 90% 85%, rgba(232,224,246,.85), transparent 30%),
+        var(--cream);
+    }
+
+    button, input, textarea { font: inherit; }
+
+    .page {
+      display: none;
+      min-height: 100vh;
+      padding: 28px 16px 44px;
+      animation: fadeIn .45s ease;
+    }
+
+    .page.active { display: block; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .container {
+      width: min(900px, 100%);
+      margin: 0 auto;
+    }
+
+    .paper {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(24px, 5vw, 54px);
+      border: 1px solid rgba(216,141,169,.25);
+      border-radius: 28px;
+      background: rgba(255,253,249,.94);
+      box-shadow: var(--shadow);
+    }
+
+    .paper::before {
+      content: "";
+      position: absolute;
+      inset: 12px;
+      border: 1px dashed rgba(216,141,169,.42);
+      border-radius: 20px;
+      pointer-events: none;
+    }
+
+    .content { position: relative; z-index: 1; text-align: center; }
+
+    .script {
+      color: var(--pink-dark);
+      font-family: "Pacifico", cursive;
+      font-size: clamp(1.25rem, 4vw, 1.8rem);
+      margin-bottom: 12px;
+    }
+
+    h1, h2 {
+      margin: 8px 0 14px;
+      color: #684f65;
+      font-family: "Playfair Display", serif;
+      line-height: 1.2;
+    }
+
+    h1 { font-size: clamp(2.2rem, 7vw, 4rem); }
+    h2 { font-size: clamp(1.8rem, 5vw, 2.6rem); }
+
+    p {
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    .subtitle {
+      max-width: 620px;
+      margin: 0 auto 24px;
+      font-size: 1rem;
+    }
+
+    .panda {
+      display: inline-grid;
+      width: 112px;
+      height: 112px;
+      place-items: center;
+      margin: 8px 0 16px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #fff, #f7e7ef);
+      box-shadow: 0 8px 22px rgba(112,77,99,.12);
+      font-size: 4.3rem;
+    }
+
+    .tiny-note {
+      margin-top: 22px;
+      font-size: .88rem;
+      color: #a28e9c;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 48px;
+      margin: 8px 5px;
+      padding: 13px 23px;
+      border: 0;
+      border-radius: 999px;
+      color: white;
+      background: linear-gradient(135deg, #d88da9, #bd91c9);
+      box-shadow: 0 8px 18px rgba(189,145,201,.25);
+      cursor: pointer;
+      font-weight: 700;
+      text-decoration: none;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 11px 22px rgba(189,145,201,.3); }
+    .btn.secondary { color: #795e79; background: #f1e9f7; box-shadow: none; }
+    .btn.soft { color: #8b5d72; background: #fae8ef; box-shadow: none; }
+    .btn:focus-visible, input:focus-visible, textarea:focus-visible {
+      outline: 3px solid rgba(189,145,201,.45);
+      outline-offset: 3px;
+    }
+
+    .top-decor {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      color: #d49ab1;
+      font-size: 1.25rem;
+    }
+
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
+      margin: 30px 0;
+    }
+
+    .polaroid {
+      padding: 12px 12px 18px;
+      background: white;
+      box-shadow: 0 8px 20px rgba(90,65,84,.13);
+      transform: rotate(-2deg);
+      transition: transform .2s ease;
+    }
+
+    .polaroid:nth-child(2) { transform: rotate(2deg); }
+    .polaroid:nth-child(3) { transform: rotate(-1deg); }
+    .polaroid:hover { transform: rotate(0) translateY(-4px); }
+
+    .photo {
+      display: grid;
+      min-height: 145px;
+      place-items: center;
+      border-radius: 3px;
+      background: linear-gradient(145deg, #f8e4ed, #e9e2f6);
+      font-size: 3.5rem;
+    }
+
+    .polaroid p {
+      margin: 12px 0 0;
+      color: #806b7d;
+      font-family: "Playfair Display", serif;
+      font-size: 1rem;
+    }
+
+    .form-card, .letter-card {
+      max-width: 620px;
+      margin: 26px auto 0;
+      padding: 26px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      background: #fff;
+      box-shadow: 0 8px 22px rgba(112,77,99,.08);
+      text-align: left;
+    }
+
+    label {
+      display: block;
+      margin: 14px 0 7px;
+      color: #735d70;
+      font-weight: 700;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 13px 15px;
+      border: 1px solid #e8d9e1;
+      border-radius: 13px;
+      color: var(--ink);
+      background: #fffdfd;
+    }
+
+    textarea { min-height: 145px; resize: vertical; }
+
+    .status {
+      min-height: 26px;
+      margin: 12px 0 0;
+      color: #8b6682;
+      font-size: .93rem;
+    }
+
+    .surprise-box {
+      margin: 26px auto;
+      padding: 28px;
+      max-width: 650px;
+      border-radius: 24px;
+      background: linear-gradient(135deg, #fff0f5, #f1ecfb);
+    }
+
+    .surprise-box .big-panda { font-size: 4.2rem; }
+    .birthday-message {
+      color: #765d76;
+      font-family: "Playfair Display", serif;
+      font-size: clamp(1.25rem, 4vw, 1.65rem);
+      line-height: 1.7;
+    }
+
+    .letter-card {
+      min-height: 230px;
+      background:
+        repeating-linear-gradient(to bottom, #fff 0, #fff 31px, #f2e8ed 32px);
+    }
+
+    .letter-from {
+      margin: 0 0 16px;
+      color: #c17f9b;
+      font-family: "Pacifico", cursive;
+      font-size: 1.3rem;
+    }
+
+    .letter-text {
+      white-space: pre-wrap;
+      color: #655666;
+      line-height: 1.9;
+    }
+
+    .locked {
+      margin: 22px auto;
+      padding: 18px;
+      max-width: 560px;
+      border-radius: 18px;
+      background: #f7eff8;
+      color: #826b85;
+    }
+
+    .footer-note {
+      margin-top: 24px;
+      text-align: center;
+      color: #a28e9c;
+      font-size: .82rem;
+    }
+
+    @media (max-width: 650px) {
+      .page { padding: 16px 12px 30px; }
+      .paper { padding: 28px 20px; border-radius: 22px; }
+      .memory-grid { grid-template-columns: 1fr; gap: 18px; max-width: 330px; margin-inline: auto; }
+      .photo { min-height: 180px; }
+      .form-card, .letter-card { padding: 20px; }
+      .btn { width: min(100%, 280px); }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- PAGE 1: WELCOME -->
+  <section id="welcome" class="page active">
+    <div class="container">
+      <div class="paper">
+        <div class="content">
+          <div class="top-decor"><span>✿ ✧</span><span>♡ ✧</span></div>
+          <div class="script">A tiny place made with love</div>
+          <div class="panda" aria-hidden="true">🐼</div>
+          <h1>A Little World<br>of Dhariga</h1>
+          <p class="subtitle">
+            A little scrapbook filled with sweet memories, warm wishes
+            and a birthday surprise made just for you.
+          </p>
+          <button class="btn" id="welcomeButton" type="button" onclick="enterWebsite()">
+            Leave a Birthday Wish 💌
+          </button>
+          <p class="tiny-note">Made of memories, little moments and lots of love ♡</p>
+          <div class="top-decor"><span>🌷</span><span>🧸</span><span>🌷</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- PAGE 2: MEMORIES --><section id="memories" class="page">
+  <div class="container">
+    <div class="paper">
+      <div class="content">    <div class="script">A little book of us</div>
+    <h2>Our Memory Corner 🌸</h2>
+
+    <p class="subtitle">
+      Six little memories, countless smiles, and a friendship I'll always treasure. 💗
+    </p>
+
+    <div class="memory-grid">
+
+      <div class="polaroid">
+        <div class="photo">🌷☁️</div>
+         <h3>01. Where It All Started</h3>
+        <p>
+          college first day nyabagam iruka di,namma meet panni few months thaa aaguthu and you may have better bond with your school friends & i know avunga edathuku ennala ipo yaramudiyathunu but remember na confirm un life la oru mukiyamana person or torture ah irupee!!first day ennaku place kudutha oru panda kutty ku innaiku piranthanaal kondattam!!!>>.
+        </p>
+      </div>
+
+      <div class="polaroid">
+        <div class="photo">🧸💗</div>
+        <h3>02. My First Impression</h3>
+        <p>
+           Unga ellathayu first time paakumbothu konjo nervous ah thaa irunthuchu ennaku set aaguma aagatha ethuvumee therla!ennaku neetha un bag ah eduthu place kuduthaa apo seri intha  ponnu nalla ponnuthaanu nenaicheeyyy!*!I THINK NAA NENACHATHU CRT UH!!!!!*.
+         </p>
+      </div>
+
+      <div class="polaroid">
+        <div class="photo">🏆✨</div>
+        <h3>03. Our First Hackathon </h3>
+        <p>
+          Nammalooda first hackathon event-Unaku athu puthusu ennaku athu puthusu ennaku konjo bayamatha irunthuchu enna panna poromnu therla nu irunthe but somehow ne en kooda team sentha  maybe "i owe you for that",UH AND ME AS A PAIR!!!.
+        </p>
+      </div>
+
+      <div class="polaroid">
+        <div class="photo">🌙💻</div>
+        <h3>04. The Night Before hackathon</h3>
+        <p>
+Sudden ah oru naal hackathon google meet la nu sollitanga,we both are nervous'hackathon ku munnadi naal nytuh rendu peru google meet la pottu practice pannom bayama irunthuchu  but eppadiyu pannithaa aaganumnu braveness ah varavachukittu pannommm!!!morning uh practice pannom and then successfully we finished that"".
+        </p>
+      </div>
+
+      <div class="polaroid">
+        <div class="photo">💌🥹</div>
+        <h3>05. An Hour of Convincing</h3>
+        <p>
+          I still remember that little fight we had.
+          You got so emotional, and I didn't want things to stay that way.
+          So I texted you and spent almost an hour trying to convince you.
+          Some friendships are worth that extra effort!
+        </p>
+      </div>
+
+      <div class="polaroid">
+        <div class="photo">😂🐼</div>
+        <h3>06. Our Never-Ending Laughter</h3>
+        <p>
+         AND MY DEAR TOM,eppo sanda pottalum unna na eppayu convence panna ready ah irupe"I WONT GIVE UP ON YOU FOR SURE" Eppayu en kooda iru sirichute iru seriya na ethachu panna kelu yen ippadi pannura loosu nu seriya! pesama pogatha my dear birthday girl !WHEN uh say moodu,I was like woahhhhhhh.
+        </p>
+      </div>
+
+   </div>
+
+    <p class="subtitle">
+      These are just six little pieces of our story. There are so many more memories to come. 💗
+    </p>
+
+    <button class="btn" type="button" onclick="showPage('birthdayPage')">
+      Open Your Surprise 🎂
+    </button>
+
+    <button class="btn secondary" type="button"
+      onclick="showPage('letterPage'); loadWishes();">
+      Read Your Letters 💌
+    </button>
+
+    <div>
+      <button class="btn soft" type="button" onclick="showPage('welcome')">
+        Back to Welcome
+      </button>
+    </div>
+
+  </div>
+</div>
+
+  </div>
+</section>
+  <!-- PAGE 3: WISH SUBMISSION -->
+  <section id="wishPage" class="page">
+    <div class="container">
+      <div class="paper">
+        <div class="content">
+          <div class="script">A little note for the birthday girl</div>
+          <h2>Leave a Birthday Wish 💌</h2>
+          <p class="subtitle">
+            Write a sweet message for Dhariga. Your note will be saved
+            and opened on her birthday!
+          </p>
+
+          <div class="form-card">
+            <form id="wishForm" method="POST" target="submissionFrame">
+              <label for="sender">Your name</label>
+              <input id="sender" name="sender" type="text" maxlength="45" placeholder="Write your name" required>
+
+              <label for="message">Your birthday wish</label>
+              <textarea id="message" name="message" maxlength="700" placeholder="Write something lovely..." required></textarea>
+
+              <div style="text-align:center">
+                <button class="btn" id="submitButton" type="submit">Send My Wish 💗</button>
+                <button class="btn secondary" type="button" onclick="showPage('welcome')">Back</button>
+              </div>
+              <p class="status" id="formStatus" role="status" aria-live="polite"></p>
+            </form>
+            <iframe name="submissionFrame" id="submissionFrame" title="Wish submission" style="display:none"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 4: BIRTHDAY SURPRISE -->
+  <section id="birthdayPage" class="page">
+    <div class="container">
+      <div class="paper">
+        <div class="content">
+          <div class="script">Today is all about you</div>
+          <div class="panda" aria-hidden="true">🐼🎂</div>
+          <h1>Happy Birthday,<br>PANDA! 🎉</h1>
+          <div class="surprise-box">
+            <div class="big-panda">🎀🌸💗</div>
+            <p class="birthday-message">
+             EN INIYA THOZHIKU INDRU PIRANTHANAAL KONDAATAM!!!
+            </p>
+            <p>Actually this web is only for you!!A virtual hug for uhh chelloo!!. ♡</p>
+          </div>
+          <button class="btn" type="button" onclick="showPage('letterPage'); loadWishes();">Open Your Letters 💌</button>
+          <button class="btn secondary" type="button" onclick="showPage('memories')">Back to Memories</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PAGE 5: BIRTHDAY LETTERS -->
+  <section id="letterPage" class="page">
+    <div class="container">
+      <div class="paper">
+        <div class="content">
+          <div class="script">Little words, lots of love</div>
+          <h2>Your Birthday Letters 💌</h2>
+          <p class="subtitle">#ORU ORU LETTER UM UNNAKAAGA VANTHATHU!!.</p>
+
+          <div id="lettersArea">
+            <div class="locked">Your letters are being gathered…</div>
+          </div>
+
+          <button class="btn" id="nextLetterButton" type="button" onclick="showNextLetter()" style="display:none">Next Letter 💗</button>
+          <div>
+            <button class="btn secondary" type="button" onclick="showPage('birthdayPage')">Back to Birthday Surprise</button>
+            <button class="btn soft" type="button" onclick="showPage('memories')">Memories</button>
+          </div>
+<button class="btn soft" type="button" onclick="showPage('welcome')">
+        Back to Welcome
+      </button>
+    </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer-note">A little web made with ♡</div>
+
+  <script>
+    // Google Apps Script web app URL used to save and retrieve birthday wishes.
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzSlzUKqWQddpdMiYclKKxGRjQlmzE-ahzyB0nLBLRpFg0Eqb4mYhCYTci57fmUEY0/exec";
+    const BIRTHDAY = "2026-11-25";
+
+    function getIndiaDate() {
+      const parts = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Asia/Kolkata",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit"
+      }).formatToParts(new Date());
+
+      const values = {};
+      parts.forEach(part => {
+        if (part.type !== "literal") values[part.type] = part.value;
+      });
+
+      return `${values.year}-${values.month}-${values.day}`;
+    }
+
+    function isBirthdayUnlocked() {
+      return getIndiaDate() >= BIRTHDAY;
+    }
+
+    function showPage(pageId) {
+      const target = document.getElementById(pageId);
+
+      if (!target) {
+        alert("This page is missing. Please check the HTML file.");
+        return;
+      }
+
+      if (!isBirthdayUnlocked() && ["memories", "birthdayPage", "letterPage"].includes(pageId)) {
+        alert("This little world will open on November 25 💗");
+        return;
+      }
+
+      if (isBirthdayUnlocked() && pageId === "wishPage") {
+        alert("Birthday wishes are now closed. The surprise is ready! 🎂");
+        return;
+      }
+
+      document.querySelectorAll(".page").forEach(page => page.classList.remove("active"));
+      target.classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function enterWebsite() {
+      if (isBirthdayUnlocked()) {
+        showPage("memories");
+      } else {
+        showPage("wishPage");
+      }
+    }
+
+    function updateWelcomeButton() {
+      const button = document.getElementById("welcomeButton");
+      if (!button) return;
+
+      button.textContent = isBirthdayUnlocked()
+        ? "Open Your Little World 🌸"
+        : "Leave a Birthday Wish 💌";
+    }
+
+    // Submit wishes to Google Sheets. The Apps Script doPost reads
+    // the form fields named "sender" and "message".
+    const wishForm = document.getElementById("wishForm");
+    const submissionFrame = document.getElementById("submissionFrame");
+    let wishSubmissionStarted = false;
+
+    wishForm.action = SCRIPT_URL;
+
+    wishForm.addEventListener("submit", function(event) {
+      if (isBirthdayUnlocked()) {
+        event.preventDefault();
+        document.getElementById("formStatus").textContent =
+          "Birthday wishes are closed now. Happy birthday! 🎂";
+        return;
+      }
+
+      const sender = document.getElementById("sender").value.trim();
+      const message = document.getElementById("message").value.trim();
+
+      if (!sender || !message) {
+        event.preventDefault();
+        document.getElementById("formStatus").textContent = "Please fill in both boxes.";
+        return;
+      }
+
+      if (sender.length > 45 || message.length > 700) {
+        event.preventDefault();
+        document.getElementById("formStatus").textContent = "Please shorten your message a little.";
+        return;
+      }
+
+      wishSubmissionStarted = true;
+      document.getElementById("submitButton").disabled = true;
+      document.getElementById("submitButton").textContent = "Sending…";
+      document.getElementById("formStatus").textContent = "Sending your wish…";
+    });
+
+    submissionFrame.addEventListener("load", function() {
+      if (!wishSubmissionStarted) return;
+
+      wishSubmissionStarted = false;
+      document.getElementById("submitButton").disabled = false;
+      document.getElementById("submitButton").textContent = "Send My Wish 💗";
+      document.getElementById("formStatus").textContent =
+        "Your wish has been sent! Thank you for making her day special. 💗";
+      wishForm.reset();
+    });
+
+    // The Apps Script doGet returns JSONP, so load it as a script
+    // instead of using fetch().
+    let allWishes = [];
+    let currentWishIndex = 0;
+    let wishesLoaded = false;
+    let wishesLoading = false;
+
+    window.handleWishes = function(result) {
+      wishesLoading = false;
+      wishesLoaded = true;
+
+      const area = document.getElementById("lettersArea");
+      const nextButton = document.getElementById("nextLetterButton");
+
+      if (!result || !result.ok || !Array.isArray(result.wishes)) {
+        area.innerHTML = '<div class="locked">The letters could not be loaded right now. Please try again in a moment. 💗</div>';
+        nextButton.style.display = "none";
+        return;
+      }
+
+      allWishes = result.wishes.filter(wish =>
+        wish && String(wish.sender || "").trim() && String(wish.message || "").trim()
+      );
+
+      // Shuffle letters so they appear in a different order.
+      for (let i = allWishes.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [allWishes[i], allWishes[j]] = [allWishes[j], allWishes[i]];
+      }
+
+      currentWishIndex = 0;
+
+      if (allWishes.length === 0) {
+        area.innerHTML = '<div class="locked">No letters have arrived yet. But there is still so much love here! 💗</div>';
+        nextButton.style.display = "none";
+        return;
+      }
+
+      renderCurrentLetter();
+    };
+
+    function loadWishes() {
+      if (!isBirthdayUnlocked()) {
+        document.getElementById("lettersArea").innerHTML =
+          '<div class="locked">Shhh… the letters are locked until November 25! 🎀</div>';
+        document.getElementById("nextLetterButton").style.display = "none";
+        return;
+      }
+
+      if (wishesLoaded || wishesLoading) return;
+
+      wishesLoading = true;
+      document.getElementById("lettersArea").innerHTML =
+        '<div class="locked">Opening your letters… 💌</div>';
+
+      const oldScript = document.getElementById("wishesScript");
+      if (oldScript) oldScript.remove();
+
+      const script = document.createElement("script");
+      script.id = "wishesScript";
+      script.src = SCRIPT_URL + "?callback=handleWishes&cache=" + Date.now();
+      script.onerror = function() {
+        wishesLoading = false;
+        document.getElementById("lettersArea").innerHTML =
+          '<div class="locked">Could not connect to the letter box. Please try again. 💗</div>';
+      };
+      document.body.appendChild(script);
+    }
+
+    function renderCurrentLetter() {
+      const area = document.getElementById("lettersArea");
+      const nextButton = document.getElementById("nextLetterButton");
+      const wish = allWishes[currentWishIndex];
+
+      if (!wish) return;
+
+      const card = document.createElement("div");
+      card.className = "letter-card";
+
+      const from = document.createElement("p");
+      from.className = "letter-from";
+      from.textContent = "A little note from " + wish.sender;
+
+      const message = document.createElement("p");
+      message.className = "letter-text";
+      message.textContent = wish.message;
+
+      const count = document.createElement("p");
+      count.className = "tiny-note";
+      count.textContent = `Letter ${currentWishIndex + 1} of ${allWishes.length}`;
+
+      card.appendChild(from);
+      card.appendChild(message);
+      card.appendChild(count);
+
+      area.replaceChildren(card);
+      nextButton.textContent = currentWishIndex === allWishes.length - 1
+        ? "Read First Letter Again 💗"
+        : "Next Letter 💗";
+      nextButton.style.display = "inline-flex";
+    }
+
+    function showNextLetter() {
+      if (!allWishes.length) return;
+      currentWishIndex = (currentWishIndex + 1) % allWishes.length;
+      renderCurrentLetter();
+    }
+
+    updateWelcomeButton();
+  </script>
+</body>
+</html>
